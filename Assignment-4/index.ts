@@ -13,10 +13,11 @@ interface Address {
 }
 
 type StudentKeys = keyof Student;
-type UpdateProps = Pick<Student, StudentKeys>;
+//type UpdateProps = Pick<Student, StudentKeys>;
+type UpdateProps = Pick<Student, 'name' | 'email'>
 
 
-function updateStudent(student: Student, updates: Partial<UpdateProps>): Student {
+function updateStudent(student: Student, updates: UpdateProps): Student {
     return { ...student, ...updates };
 }
 
@@ -33,14 +34,14 @@ const student: Student = {
 };
 
 
-const updatedStudent = updateStudent(student, { name: "Anush Korepu", email: "anushkorepu@gmail.com", age: 30, courseList: ["ML"] });
+const updatedStudent = updateStudent(student, { name: "Anush Korepu", email: "anushkorepu@gmail.com"});
 console.log(updatedStudent);
 
 //============================Task-2=============================================
 
 
-//type StringCheck<T> = T extends string ? "Yes" : "No";
-function StringCheck<T> (input: T): "Yes" | "No" {
+type StringCheck<T> = T extends string ? "Yes" : "No";
+/*function StringCheck<T> (input: T): "Yes" | "No" {
     if(typeof input === "string"){
         return "Yes";
     }
@@ -49,7 +50,7 @@ function StringCheck<T> (input: T): "Yes" | "No" {
     }
 }
 console.log(StringCheck("Rekha"));
-console.log(StringCheck(30)); 
+console.log(StringCheck(30)); */
 
 //=========================Task-3======================================
 
@@ -57,8 +58,8 @@ interface Employee {
     id: number,
     name: string,
     Department: string,
-    isteamLead: boolean,
     teamLead?: Employee,
+    isteamLead?: boolean
     
 }
 
@@ -76,7 +77,7 @@ interface Employee {
         console.log(name, "is not teamLead");
     }
  }*/
- function isteamLead(emp : Employee[]){
+ /*function isteamLead(emp : Employee[]){
     emp.forEach(e => {
         if(e.isteamLead){
           console.log(e.name, "is teamLead");
@@ -85,15 +86,27 @@ interface Employee {
         console.log(e.name, "is not teamLead");
      }
     });
+}*/
+function isTeamLead(employee: Employee, employees: Employee[]): void{
+    for (const emp of employees) {
+        if (emp.teamLead && emp.teamLead.id === employee.id) {
+            console.log(employee.name, "is a teamLead");
+            return;
+        }
+    }
+    console.log(employee.name, "is not a teamLead");
+}
+
+const Employeearray: Employee[] = [
+    {id: 100 , name: "Akhila", Department : "Development"},
+    {id: 200, name: "shravani", Department: "Management", teamLead: {id: 100 , name: "Akhila", Department : "Development"}},
+    {id: 300, name: "Lavanya", Department: "Management" },
+    {id: 400, name: "Deepthi", Department: "Development", teamLead: {id: 300, name: "Lavanya", Department: "Management"}}
+ ];
+
+ for(let i=0;i<Employeearray.length;i++){
+    isTeamLead(Employeearray[i], Employeearray);
 }
 
 
- const Employeearray: Employee[] = [
-    {id: 100 , name: "Akhila", Department : "Development", isteamLead: true},
-    {id: 200, name: "shravani", Department: "Management", isteamLead: false, teamLead: {id: 100 , name: "Akhila", Department : "Development", isteamLead: false}},
-    {id: 300, name: "Lavanya", Department: "Management", isteamLead: true},
-    {id: 400, name: "Deepthi", Department: "Development", isteamLead: false, teamLead: {id: 300, name: "Lavanya", Department: "Management", isteamLead: true}}
- ];
-
- isteamLead(Employeearray)
 

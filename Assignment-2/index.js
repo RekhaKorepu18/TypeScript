@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var util_1 = require("./util");
-var student = /** @class */ (function () {
-    function student(name, age, email, course, address) {
+var Student = /** @class */ (function () {
+    function Student(name, age, email, course, address) {
         this.name = name;
         this.age = age;
         this.email = email;
@@ -12,9 +12,9 @@ var student = /** @class */ (function () {
     student.prototype.getDetails = function () {
         return "Name: ".concat(this.name, ", Age: ").concat(this.age, ", email: ").concat(this.email, ", courseList: ").concat(this.courseList, ", address: ").concat(this.address);
     };
-    return student;
+    return Student;
 }());
-var rekha = new student("rekha", 20, "rekhakorepu@gmail.com", ["java", "react"], "Rajanna sircilla");
+var rekha = new Student("rekha", 20, "rekhakorepu@gmail.com", ["java", "react"], "Rajanna sircilla");
 console.log(rekha.getDetails());
 //======Generics=============//
 var values = [1, 2, 3];

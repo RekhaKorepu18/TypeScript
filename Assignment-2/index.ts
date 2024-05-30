@@ -1,6 +1,6 @@
 import { getObjects, Person } from './util';
 
-class student {
+class Student {
     name : string;
     age : number;
     email: string;
@@ -18,7 +18,7 @@ class student {
         return `Name: ${this.name}, Age: ${this.age}, email: ${this.email}, courseList: ${this.courseList}, address: ${this.address}`;
     }
 }
-const rekha = new student("rekha", 20, "rekhakorepu@gmail.com", ["java", "react"], "Rajanna sircilla");
+const rekha = new Student("rekha", 20, "rekhakorepu@gmail.com", ["java", "react"], "Rajanna sircilla");
 console.log(rekha.getDetails());
 
 //======Generics=============//
@@ -43,11 +43,11 @@ interface StudentDetails {
     address : string;
 }
  
-type alterReadOnly<Type> = {
+type AlterReadOnly<Type> = {
     readonly [P in keyof Type]: Type[P];
 }
 
-const student1: alterReadOnly<StudentDetails> = {
+const student1: AlterReadOnly<StudentDetails> = {
     name: "Anush Korepu",
     id: 123,
     age: 21,

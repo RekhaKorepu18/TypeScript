@@ -23,20 +23,8 @@ var student = {
         pincode: "505404"
     }
 };
-var updatedStudent = updateStudent(student, { name: "Anush Korepu", email: "anushkorepu@gmail.com", age: 30, courseList: ["ML"] });
+var updatedStudent = updateStudent(student, { name: "Anush Korepu", email: "anushkorepu@gmail.com" });
 console.log(updatedStudent);
-//============================Task-2=============================================
-//type StringCheck<T> = T extends string ? "Yes" : "No";
-function StringCheck(input) {
-    if (typeof input === "string") {
-        return "Yes";
-    }
-    else {
-        return "No";
-    }
-}
-console.log(StringCheck("Rekha"));
-console.log(StringCheck(30));
 //=========================Task-4=============================
 /*function isteamLead(emp : Employee[], name: string){
    let flag: number =0;
@@ -51,20 +39,37 @@ console.log(StringCheck(30));
        console.log(name, "is not teamLead");
    }
 }*/
-function isteamLead(emp) {
-    emp.forEach(function (e) {
-        if (e.isteamLead) {
-            console.log(e.name, "is teamLead");
+/*function isteamLead(emp : Employee[]){
+   emp.forEach(e => {
+       if(e.isteamLead){
+         console.log(e.name, "is teamLead");
         }
-        else {
-            console.log(e.name, "is not teamLead");
+   else{
+       console.log(e.name, "is not teamLead");
+    }
+   });
+}*/
+function isTeamLead(employee, employees) {
+    for (var _i = 0, employees_1 = employees; _i < employees_1.length; _i++) {
+        var emp = employees_1[_i];
+        if (emp.teamLead && emp.teamLead.id === employee.id) {
+            console.log(employee.name, "is a teamLead");
+            return;
         }
-    });
+    }
+    console.log(employee.name, "is not a teamLead");
 }
 var Employeearray = [
-    { id: 100, name: "Akhila", Department: "Development", isteamLead: true },
-    { id: 200, name: "shravani", Department: "Management", isteamLead: false, teamLead: { id: 100, name: "Akhila", Department: "Development", isteamLead: false } },
-    { id: 300, name: "Lavanya", Department: "Management", isteamLead: true },
-    { id: 400, name: "Deepthi", Department: "Development", isteamLead: false, teamLead: { id: 300, name: "Lavanya", Department: "Management", isteamLead: true } }
+    { id: 100, name: "Akhila", Department: "Development" },
+    { id: 200, name: "shravani", Department: "Management", teamLead: { id: 100, name: "Akhila", Department: "Development" } },
+    { id: 300, name: "Lavanya", Department: "Management" },
+    { id: 400, name: "Deepthi", Department: "Development", teamLead: { id: 300, name: "Lavanya", Department: "Management" } }
 ];
-isteamLead(Employeearray);
+//isteamLead(Employeearray);
+/*isTeamLead(Employeearray[0], Employeearray);
+isTeamLead(Employeearray[1], Employeearray);
+isTeamLead(Employeearray[2], Employeearray);
+isTeamLead(Employeearray[3], Employeearray);*/
+for (var i = 0; i < Employeearray.length; i++) {
+    isTeamLead(Employeearray[i], Employeearray);
+}

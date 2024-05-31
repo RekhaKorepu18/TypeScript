@@ -1,82 +1,116 @@
+var ShoppingItem = /** @class */ (function () {
+    function ShoppingItem(newitem) {
+        this.newitem = newitem;
+        this.deleted = false;
+        this.done = false;
+    }
+    ShoppingItem.prototype.toggleDone = function () {
+        this.done = !this.done;
+    };
+    ShoppingItem.prototype.deleteItem = function () {
+        this.deleted = true;
+    };
+    return ShoppingItem;
+}());
 var shoppingList = [];
 function showList() {
     var shoppingListElement = document.getElementById('shoppingList');
     var markedCountElement = document.getElementById('markedCount');
     var unmarkedCountElement = document.getElementById('unmarkedCount');
     var totalCountElement = document.getElementById('totalCount');
-    if (!shoppingListElement || !markedCountElement || !unmarkedCountElement || !totalCountElement) {
-        return;
-    }
     shoppingListElement.innerHTML = '';
     var markedCount = 0;
     var unmarkedCount = 0;
     shoppingList.forEach(function (item, index) {
         if (!item.deleted) {
-            var li = document.createElement('li');
-            li.classList.add('shopping-item');
+            createListItem(item, index, shoppingListElement);
             if (item.done) {
-                li.classList.add('done');
                 markedCount++;
             }
             else {
                 unmarkedCount++;
             }
-            li.textContent = item.newitem;
-            li.addEventListener('click', function () {
-                toggle(index);
-            });
-            var deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'X';
-            deleteBtn.addEventListener('click', function (event) {
-                event.stopPropagation();
-                deleteItem(index);
-            });
-            li.appendChild(deleteBtn);
-            shoppingListElement.appendChild(li);
         }
     });
     markedCountElement.textContent = "Marked: ".concat(markedCount);
     unmarkedCountElement.textContent = "Unmarked: ".concat(unmarkedCount);
     totalCountElement.textContent = "Total: ".concat(markedCount + unmarkedCount);
 }
+function createListItem(item, index, parentElement) {
+    var li = document.createElement('li');
+    li.classList.add('shopping-item');
+    if (item.done) {
+        li.classList.add('done');
+    }
+    li.textContent = item.newitem;
+    li.addEventListener('click', function () {
+        toggleItem(index);
+    });
+    var deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'X';
+    deleteBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        deleteShoppingItem(index);
+    });
+    li.appendChild(deleteBtn);
+    parentElement.appendChild(li);
+}
 function addItem(item) {
     if (item.trim() !== '') {
-        shoppingList.push({
-            newitem: item.trim(),
-            deleted: false,
-            done: false
-        });
-        showList();
+        var newItem = new ShoppingItem(item.trim());
+        shoppingList.push(newItem);
+        var shoppingListElement = document.getElementById('shoppingList');
+        createListItem(newItem, shoppingList.length - 1, shoppingListElement);
+        updateCounts();
     }
     else {
         window.alert("Oops! you have not entered any item");
+        return;
     }
 }
-function deleteItem(index) {
-    shoppingList[index].deleted = true;
+function deleteShoppingItem(index) {
+    shoppingList[index].deleteItem();
     showList();
 }
-function toggle(index) {
-    shoppingList[index].done = !shoppingList[index].done;
+function toggleItem(index) {
+    shoppingList[index].toggleDone();
     showList();
 }
-function setupEventListeners() {
-    var addItemBtn = document.getElementById('addItemBtn');
-    var newItemInput = document.getElementById('newItemInput');
-    var hideCompletedCheckbox = document.getElementById('hideCompletedCheckbox');
-    addItemBtn === null || addItemBtn === void 0 ? void 0 : addItemBtn.addEventListener('click', function () {
-        if (newItemInput) {
-            addItem(newItemInput.value);
-            newItemInput.value = '';
+function updateCounts() {
+    var markedCountElement = document.getElementById('markedCount');
+    var unmarkedCountElement = document.getElementById('unmarkedCount');
+    var totalCountElement = document.getElementById('totalCount');
+    var markedCount = 0;
+    var unmarkedCount = 0;
+    shoppingList.forEach(function (item) {
+        if (!item.deleted) {
+            if (item.done) {
+                markedCount++;
+            }
+            else {
+                unmarkedCount++;
+            }
         }
     });
-    newItemInput === null || newItemInput === void 0 ? void 0 : newItemInput.addEventListener('keypress', function (event) {
+    markedCountElement.textContent = "Marked: ".concat(markedCount);
+    unmarkedCountElement.textContent = "Unmarked: ".concat(unmarkedCount);
+    totalCountElement.textContent = "Total: ".concat(markedCount + unmarkedCount);
+}
+document.addEventListener('DOMContentLoaded', function () {
+    var _a, _b, _c;
+    (_a = document.getElementById('addItemBtn')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', function () {
+        var newItemInput = document.getElementById('newItemInput');
+        addItem(newItemInput.value);
+        newItemInput.value = '';
+    });
+    (_b = document.getElementById('newItemInput')) === null || _b === void 0 ? void 0 : _b.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-            addItem(event.target.value);
-            event.target.value = '';
+            var target = event.target;
+            addItem(target.value);
+            target.value = '';
         }
     });
-    hideCompletedCheckbox === null || hideCompletedCheckbox === void 0 ? void 0 : hideCompletedCheckbox.addEventListener('change', function (event) {
+    (_c = document.getElementById('hideCompletedCheckbox')) === null || _c === void 0 ? void 0 : _c.addEventListener('change', function (event) {
         var hide = event.target.checked;
         var doneItems = document.querySelectorAll('.shopping-item.done');
         doneItems.forEach(function (item) {
@@ -84,9 +118,4 @@ function setupEventListeners() {
         });
     });
     showList();
-}
-if (typeof document !== 'undefined') {
-    document.addEventListener('DOMContentLoaded', function () {
-        setupEventListeners();
-    });
-}
+});

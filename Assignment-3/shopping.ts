@@ -1,21 +1,30 @@
-interface ShoppingItem {
+class ShoppingItem {
     newitem: string;
     deleted: boolean;
     done: boolean;
+
+    constructor(newitem: string) {
+        this.newitem = newitem;
+        this.deleted = false;
+        this.done = false;
+    }
+
+    toggleDone(): void {
+        this.done = !this.done;
+    }
+
+    deleteItem(): void {
+        this.deleted = true;
+    }
 }
 
 const shoppingList: ShoppingItem[] = [];
 
 function showList(): void {
-    const shoppingListElement = document.getElementById('shoppingList') as HTMLUListElement | null;
-    const markedCountElement = document.getElementById('markedCount') as HTMLElement | null;
-    const unmarkedCountElement = document.getElementById('unmarkedCount') as HTMLElement | null;
-    const totalCountElement = document.getElementById('totalCount') as HTMLElement | null;
-
-    if (!shoppingListElement || !markedCountElement || !unmarkedCountElement || !totalCountElement) {
-        return;
-    }
-
+    const shoppingListElement = document.getElementById('shoppingList') as HTMLElement;
+    const markedCountElement = document.getElementById('markedCount') as HTMLElement;
+    const unmarkedCountElement = document.getElementById('unmarkedCount') as HTMLElement;
+    const totalCountElement = document.getElementById('totalCount') as HTMLElement;
     shoppingListElement.innerHTML = '';
 
     let markedCount = 0;
@@ -23,31 +32,12 @@ function showList(): void {
 
     shoppingList.forEach((item, index) => {
         if (!item.deleted) {
-            const li = document.createElement('li');
-            li.classList.add('shopping-item');
-
+            createListItem(item, index, shoppingListElement);
             if (item.done) {
-                li.classList.add('done');
                 markedCount++;
             } else {
                 unmarkedCount++;
             }
-
-            li.textContent = item.newitem;
-
-            li.addEventListener('click', () => {
-                toggle(index);
-            });
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'X';
-            deleteBtn.addEventListener('click', (event: MouseEvent) => {
-                event.stopPropagation();
-                deleteItem(index);
-            });
-
-            li.appendChild(deleteBtn);
-            shoppingListElement.appendChild(li);
         }
     });
 
@@ -56,61 +46,97 @@ function showList(): void {
     totalCountElement.textContent = `Total: ${markedCount + unmarkedCount}`;
 }
 
+function createListItem(item: ShoppingItem, index: number, parentElement: HTMLElement): void {
+    const li = document.createElement('li');
+    li.classList.add('shopping-item');
+    if (item.done) {
+        li.classList.add('done');
+    }
+    li.textContent = item.newitem;
+
+    li.addEventListener('click', () => {
+        toggleItem(index);
+    });
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'X';
+    deleteBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        deleteShoppingItem(index);
+    });
+
+    li.appendChild(deleteBtn);
+    parentElement.appendChild(li);
+}
+
 function addItem(item: string): void {
     if (item.trim() !== '') {
-        shoppingList.push({
-            newitem: item.trim(),
-            deleted: false,
-            done: false
-        });
-        showList();
+        const newItem = new ShoppingItem(item.trim());
+        shoppingList.push(newItem);
+        const shoppingListElement = document.getElementById('shoppingList') as HTMLElement;
+        createListItem(newItem, shoppingList.length - 1, shoppingListElement);
+        updateCounts();
     } else {
         window.alert("Oops! you have not entered any item");
+        return;
     }
 }
 
-function deleteItem(index: number): void {
-    shoppingList[index].deleted = true;
+function deleteShoppingItem(index: number): void {
+    shoppingList[index].deleteItem();
     showList();
 }
 
-function toggle(index: number): void {
-    shoppingList[index].done = !shoppingList[index].done;
+function toggleItem(index: number): void {
+    shoppingList[index].toggleDone();
     showList();
 }
 
-function setupEventListeners(): void {
-    const addItemBtn = document.getElementById('addItemBtn') as HTMLButtonElement | null;
-    const newItemInput = document.getElementById('newItemInput') as HTMLInputElement | null;
-    const hideCompletedCheckbox = document.getElementById('hideCompletedCheckbox') as HTMLInputElement | null;
+function updateCounts(): void {
+    const markedCountElement = document.getElementById('markedCount') as HTMLElement;
+    const unmarkedCountElement = document.getElementById('unmarkedCount') as HTMLElement;
+    const totalCountElement = document.getElementById('totalCount') as HTMLElement;
 
-    addItemBtn?.addEventListener('click', () => {
-        if (newItemInput) {
-            addItem(newItemInput.value);
-            newItemInput.value = '';
+    let markedCount = 0;
+    let unmarkedCount = 0;
+
+    shoppingList.forEach(item => {
+        if (!item.deleted) {
+            if (item.done) {
+                markedCount++;
+            } else {
+                unmarkedCount++;
+            }
         }
     });
 
-    newItemInput?.addEventListener('keypress', (event: KeyboardEvent) => {
+    markedCountElement.textContent = `Marked: ${markedCount}`;
+    unmarkedCountElement.textContent = `Unmarked: ${unmarkedCount}`;
+    totalCountElement.textContent = `Total: ${markedCount + unmarkedCount}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('addItemBtn')?.addEventListener('click', () => {
+        const newItemInput = document.getElementById('newItemInput') as HTMLInputElement;
+        addItem(newItemInput.value);
+        newItemInput.value = '';
+    });
+
+    document.getElementById('newItemInput')?.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
-            addItem((event.target as HTMLInputElement).value);
-            (event.target as HTMLInputElement).value = '';
+            const target = event.target as HTMLInputElement;
+            addItem(target.value);
+            target.value = '';
         }
     });
 
-    hideCompletedCheckbox?.addEventListener('change', (event: Event) => {
+    document.getElementById('hideCompletedCheckbox')?.addEventListener('change', (event) => {
         const hide = (event.target as HTMLInputElement).checked;
-        const doneItems = document.querySelectorAll('.shopping-item.done');
+        const doneItems = document.querySelectorAll('.shopping-item.done') as NodeListOf<HTMLElement>;
         doneItems.forEach((item) => {
-            (item as HTMLElement).style.display = hide ? 'none' : 'block';
+            item.style.display = hide ? 'none' : 'block';
         });
     });
 
     showList();
-}
-
-if (typeof document !== 'undefined') {
-    document.addEventListener('DOMContentLoaded', () => {
-        setupEventListeners();
-    });
-}
+});
